@@ -24,6 +24,32 @@ server.get('/api/users', (req, res) =>{
     })
 })
 
+// GET /api/users/:id
+
+server.get('/api/users/:id', (req, res) => {
+    const { id } = req.params;
+
+    db.findById(id)
+    .then(user => {
+        if(user) {
+            res.json(user)
+        } else {
+            res.status(404).json({
+                err: err,
+                message: "The user with the ID does not exist!!!!"
+            })
+        }
+    })
+    .catch(err => {
+        res.status(500).json({
+            err: err,
+            message: "The user id does not exist so information could not be retrieved!!!"
+        })
+    }
+
+    )
+})
+
 // LISTENING 
 
 server.listen(3000, () => {
