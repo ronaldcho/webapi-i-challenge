@@ -26,7 +26,7 @@ const db = require('./data/db.js');
 const server = express();
 
 // middleware
-server.use(express.json());
+server.use(bodyParser.json());
 server.use(cors());
 
 // parse application/x-www-form-urlencoded
@@ -81,51 +81,51 @@ server.get('/api/users/:id', (req, res) => {
 
 // POST  /api/users
 
-server.post('/api/users', jsonParser, (req, res) => {
-    const newUser = req.body;
-    const { name, bio } = req.body;
-    console.log("new user added to db: ", newUser);
-    console.log("new user name is: ", name);
-
-    db.insert(newUser)
-    .then(user => {
-        user.name.length === 0 || user.bio.length === 0
-        ? res
-            .status(400)
-            .json({ errorMessage: "Please provide name and bio for the user." })
-        : res.json(user);
-    })
-    .catch(err => {
-        res.status(500).json({
-        error: "There was an error while saving the user to the database"
-        });
-    });
-});
-
 // server.post('/api/users', (req, res) => {
-//     // define newUser assign from body
 //     const newUser = req.body;
 //     const { name, bio } = req.body;
+//     console.log("new user added to db: ", newUser);
+//     console.log("new user name is: ", name);
 
-//     // console.log('newUser is here: ', newUser);
+//     db.insert(newUser)
+//     .then(user => {
+//         user.name.length === 0 || user.bio.length === 0
+//         ? res
+//             .status(400)
+//             .json({ errorMessage: "Please provide name and bio for the user." })
+//         : res.json(user);
+//     })
+//     .catch(err => {
+//         res.status(500).json({
+//         error: "There was an error while saving the user to the database"
+//         });
+//     });
+// });
 
-//     if ( !name || !bio ) {
-//         res.status(400).json({
-//             err: "you forget to enter name and bio for the user"
-//         })
-//     } else {
-//         db.insert(newUser)
-//         .then(user => {
-//             res.status(201).json(user)
-//         })
-//         .catch(err => {
-//             res.status(500).json({
-//                 err: err,
-//                 message: "Error for saving the user info in Database!!!!"
-//             })
-//         })
-//     }
-// })
+server.post('/api/users', (req, res) => {
+    // define newUser assign from body
+    const newUser = req.body;
+    const { name, bio } = req.body;
+
+    // console.log('newUser is here: ', newUser);
+
+    if ( !name || !bio ) {
+        res.status(400).json({
+            err: "you forget to enter name and bio for the user"
+        })
+    } else {
+        db.insert(newUser)
+        .then(user => {
+            res.status(201).json(user)
+        })
+        .catch(err => {
+            res.status(500).json({
+                err: err,
+                message: "Error for saving the user info in Database!!!!"
+            })
+        })
+    }
+})
 
 // server.post('/api/users', (req, res) => {
 //     const { name, bio } = req.body;
@@ -149,6 +149,39 @@ server.post('/api/users', jsonParser, (req, res) => {
 // });
 
 
+
+// PUT /api/users/:id
+
+server.put('/api/users/:id', (req, res) => {
+
+    const { name, bio } = req.body;
+
+    if ( !name || !bio){
+        res
+        .status(400)
+        .json({
+            err: "you forget to enter name and bio for the user!!!!"
+        })
+    } else {
+        Users.update(req.params.id, req.body)
+        .then(user => {
+        if (user) {
+          res.status(200).json(user);
+        } else {
+          res
+            .status(404)
+            .json({
+              message: 'The user with the specified ID does not exist.',
+            });
+        }
+      })
+      .catch(() => {
+        res.status(500).json({
+          errorMessage: 'The user information could not be modified.',
+        });
+      });
+  }
+});
 
 // LISTENING 
 
